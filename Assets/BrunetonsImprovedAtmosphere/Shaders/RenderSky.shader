@@ -273,8 +273,8 @@
 				GetSphereShadowInOut(view_direction, sun_direction, shadow_in, shadow_out);
 
 				// Hack to fade out light shafts when the Sun is very close to the horizon.
-				float lightshaft_fadein_hack = smoothstep(
-					0.02, 0.04, dot(normalize(camera - earth_center), sun_direction));
+				//float lightshaft_fadein_hack = smoothstep(0.02, 0.04, dot(normalize(camera - earth_center), sun_direction));
+				float lightshaft_fadein_hack = 1.0;
 
 				/*
 				We then test whether the view ray intersects the sphere S or not. If it does,
