@@ -15,7 +15,7 @@ namespace BrunetonsImprovedAtmosphere
         {
             Vector3 delta = (lastMousePos - Input.mousePosition) * Time.deltaTime * speed;
 
-            if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetMouseButton(1))
             {
                 transform.Rotate(new Vector3(-delta.y, -delta.x, 0));
             }

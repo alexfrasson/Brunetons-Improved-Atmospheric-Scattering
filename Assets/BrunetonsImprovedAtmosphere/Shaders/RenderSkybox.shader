@@ -77,22 +77,22 @@
 			*/
 			float GetSunVisibility(float3 _point, float3 sun_direction)
 			{
-				float3 p = _point - kSphereCenter;
-				float p_dot_v = dot(p, sun_direction);
-				float p_dot_p = dot(p, p);
-				float ray_sphere_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
-				float distance_to_intersection = -p_dot_v - sqrt(max(0.0, kSphereRadius * kSphereRadius - ray_sphere_center_squared_distance));
+				//float3 p = _point - kSphereCenter;
+				//float p_dot_v = dot(p, sun_direction);
+				//float p_dot_p = dot(p, p);
+				//float ray_sphere_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
+				//float distance_to_intersection = -p_dot_v - sqrt(max(0.0, kSphereRadius * kSphereRadius - ray_sphere_center_squared_distance));
 
-				if (distance_to_intersection > 0.0)
-				{
-					// Compute the distance between the view ray and the sphere, and the
-					// corresponding (tangent of the) subtended angle. Finally, use this to
-					// compute an approximate sun visibility.
-					float ray_sphere_distance = kSphereRadius - sqrt(ray_sphere_center_squared_distance);
-					float ray_sphere_angular_distance = -ray_sphere_distance / p_dot_v;
+				//if (distance_to_intersection > 0.0)
+				//{
+				//	// Compute the distance between the view ray and the sphere, and the
+				//	// corresponding (tangent of the) subtended angle. Finally, use this to
+				//	// compute an approximate sun visibility.
+				//	float ray_sphere_distance = kSphereRadius - sqrt(ray_sphere_center_squared_distance);
+				//	float ray_sphere_angular_distance = -ray_sphere_distance / p_dot_v;
 
-					return smoothstep(1.0, 0.0, ray_sphere_angular_distance / sun_size.x);
-				}
+				//	return smoothstep(1.0, 0.0, ray_sphere_angular_distance / sun_size.x);
+				//}
 
 				return 1.0;
 			}
@@ -233,9 +233,9 @@
 
 				float3 sun_direction = _WorldSpaceLightPos0.xyz;
 
-				float shadow_in;
-				float shadow_out;
-				GetSphereShadowInOut(view_direction, sun_direction, shadow_in, shadow_out);
+				float shadow_in = 0;
+				float shadow_out = 0;
+				//GetSphereShadowInOut(view_direction, sun_direction, shadow_in, shadow_out);
 
 				// Hack to fade out light shafts when the Sun is very close to the horizon.
 				//float lightshaft_fadein_hack = smoothstep(0.02, 0.04, dot(normalize(camera - earth_center), sun_direction));
@@ -250,49 +250,49 @@
 				// Compute the distance between the view ray line and the sphere center,
 				// and the distance between the camera and the intersection of the view
 				// ray with the sphere (or NaN if there is no intersection).
-				float3 p = camera - kSphereCenter;
-				float p_dot_v = dot(p, view_direction);
-				float p_dot_p = dot(p, p);
-				float ray_sphere_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
-				float distance_to_intersection = -p_dot_v - sqrt(kSphereRadius * kSphereRadius - ray_sphere_center_squared_distance);
+				//float3 p = camera - kSphereCenter;
+				//float p_dot_v = dot(p, view_direction);
+				//float p_dot_p = dot(p, p);
+				//float ray_sphere_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
+				//float distance_to_intersection = -p_dot_v - sqrt(kSphereRadius * kSphereRadius - ray_sphere_center_squared_distance);
 
-				// Compute the radiance reflected by the sphere, if the ray intersects it.
-				float sphere_alpha = 0.0;
-				float3 sphere_radiance = float3(0,0,0);
-				if (distance_to_intersection > 0.0)
-				{
-					// Compute the distance between the view ray and the sphere, and the
-					// corresponding (tangent of the) subtended angle. Finally, use this to
-					// compute the approximate analytic antialiasing factor sphere_alpha.
-					float ray_sphere_distance = kSphereRadius - sqrt(ray_sphere_center_squared_distance);
-					float ray_sphere_angular_distance = -ray_sphere_distance / p_dot_v;
-					sphere_alpha = min(ray_sphere_angular_distance / fragment_angular_size, 1.0);
+				//// Compute the radiance reflected by the sphere, if the ray intersects it.
+				//float sphere_alpha = 0.0;
+				//float3 sphere_radiance = float3(0,0,0);
+				//if (distance_to_intersection > 0.0)
+				//{
+				//	// Compute the distance between the view ray and the sphere, and the
+				//	// corresponding (tangent of the) subtended angle. Finally, use this to
+				//	// compute the approximate analytic antialiasing factor sphere_alpha.
+				//	float ray_sphere_distance = kSphereRadius - sqrt(ray_sphere_center_squared_distance);
+				//	float ray_sphere_angular_distance = -ray_sphere_distance / p_dot_v;
+				//	sphere_alpha = min(ray_sphere_angular_distance / fragment_angular_size, 1.0);
 
-					/*
-					We can then compute the intersection point and its normal, and use them to
-					get the sun and sky irradiance received at this point. The reflected radiance
-					follows, by multiplying the irradiance with the sphere BRDF:
-					*/
-					float3 _point = camera + view_direction * distance_to_intersection;
-					float3 normal = normalize(_point - kSphereCenter);
+				//	/*
+				//	We can then compute the intersection point and its normal, and use them to
+				//	get the sun and sky irradiance received at this point. The reflected radiance
+				//	follows, by multiplying the irradiance with the sphere BRDF:
+				//	*/
+				//	float3 _point = camera + view_direction * distance_to_intersection;
+				//	float3 normal = normalize(_point - kSphereCenter);
 
-					// Compute the radiance reflected by the sphere.
-					float3 sky_irradiance;
-					float3 sun_irradiance = GetSunAndSkyIrradiance(_point - earth_center, normal, sun_direction, sky_irradiance);
+				//	// Compute the radiance reflected by the sphere.
+				//	float3 sky_irradiance;
+				//	float3 sun_irradiance = GetSunAndSkyIrradiance(_point - earth_center, normal, sun_direction, sky_irradiance);
 
-					sphere_radiance = kSphereAlbedo * (1.0 / PI) * (sun_irradiance + sky_irradiance);
+				//	sphere_radiance = kSphereAlbedo * (1.0 / PI) * (sun_irradiance + sky_irradiance);
 
-					/*
-					Finally, we take into account the aerial perspective between the camera and
-					the sphere, which depends on the length of this segment which is in shadow:
-					*/
-					float shadow_length = max(0.0, min(shadow_out, distance_to_intersection) - shadow_in) * lightshaft_fadein_hack;
+				//	/*
+				//	Finally, we take into account the aerial perspective between the camera and
+				//	the sphere, which depends on the length of this segment which is in shadow:
+				//	*/
+				//	float shadow_length = max(0.0, min(shadow_out, distance_to_intersection) - shadow_in) * lightshaft_fadein_hack;
 
-					float3 transmittance;
-					float3 in_scatter = GetSkyRadianceToPoint(camera - earth_center, _point - earth_center, shadow_length, sun_direction, transmittance);
+				//	float3 transmittance;
+				//	float3 in_scatter = GetSkyRadianceToPoint(camera - earth_center, _point - earth_center, shadow_length, sun_direction, transmittance);
 
-					sphere_radiance = sphere_radiance * transmittance + in_scatter;
-				}
+				//	sphere_radiance = sphere_radiance * transmittance + in_scatter;
+				//}
 
 				/*
 				In the following we repeat the same steps as above, but for the planet sphere
@@ -304,11 +304,11 @@
 				// Compute the distance between the view ray line and the Earth center,
 				// and the distance between the camera and the intersection of the view
 				// ray with the ground (or NaN if there is no intersection).
-				p = camera - earth_center;
-				p_dot_v = dot(p, view_direction);
-				p_dot_p = dot(p, p);
+				float3 p = camera - earth_center;
+				float p_dot_v = dot(p, view_direction);
+				float p_dot_p = dot(p, p);
 				float ray_earth_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
-				distance_to_intersection = -p_dot_v - sqrt(earth_center.y * earth_center.y - ray_earth_center_squared_distance);
+				float distance_to_intersection = -p_dot_v - sqrt(earth_center.y * earth_center.y - ray_earth_center_squared_distance);
 
 				// Compute the radiance reflected by the ground, if the ray intersects it.
 				float ground_alpha = 0.0;
@@ -354,7 +354,7 @@
 				}
 
 				radiance = lerp(radiance, ground_radiance, ground_alpha);
-				radiance = lerp(radiance, sphere_radiance, sphere_alpha);
+				//radiance = lerp(radiance, sphere_radiance, sphere_alpha);
 
 				radiance = pow(float3(1,1,1) - exp(-radiance / white_point * exposure), 1.0 / 2.2);
 
