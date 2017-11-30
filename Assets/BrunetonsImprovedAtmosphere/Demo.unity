@@ -159,7 +159,7 @@ MonoBehaviour:
   UseConstantSolarSpectrum: 0
   UseOzone: 1
   UseCombinedTextures: 1
-  UseHalfPrecision: 0
+  UseHalfPrecision: 1
   DoWhiteBalance: 0
   UseLuminance: 2
   Exposure: 10

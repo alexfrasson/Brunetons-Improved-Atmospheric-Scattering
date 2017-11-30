@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/BrunetonsImprovedAtmosphere/Demo.unity
-  isLoaded: 1
-  isActive: 1
