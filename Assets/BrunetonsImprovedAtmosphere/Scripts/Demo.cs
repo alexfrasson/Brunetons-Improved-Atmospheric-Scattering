@@ -35,8 +35,6 @@ namespace BrunetonsImprovedAtmosphere
 
         private Model m_model;
 
-		public Color color;
-
         /// <summary>
         /// The "real" initialization work, which is specific to our atmosphere model,
         /// is done in the following method. It starts with the creation of an atmosphere
@@ -97,7 +95,8 @@ namespace BrunetonsImprovedAtmosphere
             double kGroundAlbedo = 0.1;
             double max_sun_zenith_angle = (UseHalfPrecision ? 102.0 : 120.0) / 180.0 * Mathf.PI;
 
-            DensityProfileLayer rayleigh_layer = new DensityProfileLayer("rayleigh", 0.0, 1.0, -1.0 / kRayleighScaleHeight, 0.0, 0.0);
+
+			DensityProfileLayer rayleigh_layer = new DensityProfileLayer("rayleigh", 0.0, 1.0, -1.0 / kRayleighScaleHeight, 0.0, 0.0);
             DensityProfileLayer mie_layer = new DensityProfileLayer("mie", 0.0, 1.0, -1.0 / kMieScaleHeight, 0.0, 0.0);
 
             // Density profile increasing linearly from 0 to 1 between 10 and 25km, and
@@ -162,7 +161,9 @@ namespace BrunetonsImprovedAtmosphere
 
 			//m_model.BindToMaterial(m_material);
 			m_model.SetShaderGlobalUniforms();
-        }
+
+			Shader.SetGlobalVector("kGroundAlbedo", new Vector3(0, 0, 0.14f));
+		}
 
         private void OnDestroy()
         {
@@ -172,15 +173,6 @@ namespace BrunetonsImprovedAtmosphere
 
 		private void OnPreRender()
 		{
-			//m_model.BindToMaterial(RenderSettings.skybox);
-
-			Camera camera = Camera.main;
-
-			//RenderSettings.skybox.SetFloat("exposure", UseLuminance != LUMINANCE.NONE ? Exposure * 1e-5f : Exposure);
-			//RenderSettings.skybox.SetVector("earth_center", new Vector3(0.0f, -kBottomRadius / kLengthUnitInMeters, 0.0f));
-			//RenderSettings.skybox.SetVector("sun_size", new Vector2(Mathf.Tan(kSunAngularRadius), Mathf.Cos(kSunAngularRadius)));
-			//RenderSettings.skybox.SetVector("sun_direction", ((RenderSettings.sun == null) ? Vector3.up : RenderSettings.sun.transform.forward) * -1.0f);
-
 			double white_point_r = 1.0;
 			double white_point_g = 1.0;
 			double white_point_b = 1.0;
@@ -194,152 +186,12 @@ namespace BrunetonsImprovedAtmosphere
 				white_point_b /= white_point;
 			}
 
-			//RenderSettings.skybox.SetVector("white_point", new Vector3((float)white_point_r, (float)white_point_g, (float)white_point_b));
-
-			float CAMERA_FOV = camera.fieldOfView;
-			float CAMERA_ASPECT_RATIO = camera.aspect;
-			float CAMERA_NEAR = camera.nearClipPlane;
-			float CAMERA_FAR = camera.farClipPlane;
-
-			Matrix4x4 frustumCorners = Matrix4x4.identity;
-
-			float fovWHalf = CAMERA_FOV * 0.5f;
-
-			Vector3 toRight = camera.transform.right * CAMERA_NEAR * Mathf.Tan(fovWHalf * Mathf.Deg2Rad) * CAMERA_ASPECT_RATIO;
-			Vector3 toTop = camera.transform.up * CAMERA_NEAR * Mathf.Tan(fovWHalf * Mathf.Deg2Rad);
-
-			Vector3 topLeft = (camera.transform.forward * CAMERA_NEAR - toRight + toTop);
-			float CAMERA_SCALE = topLeft.magnitude * CAMERA_FAR / CAMERA_NEAR;
-
-			topLeft.Normalize();
-			topLeft *= CAMERA_SCALE;
-
-			Vector3 topRight = (camera.transform.forward * CAMERA_NEAR + toRight + toTop);
-			topRight.Normalize();
-			topRight *= CAMERA_SCALE;
-
-			Vector3 bottomRight = (camera.transform.forward * CAMERA_NEAR + toRight - toTop);
-			bottomRight.Normalize();
-			bottomRight *= CAMERA_SCALE;
-
-			Vector3 bottomLeft = (camera.transform.forward * CAMERA_NEAR - toRight - toTop);
-			bottomLeft.Normalize();
-			bottomLeft *= CAMERA_SCALE;
-
-			frustumCorners.SetRow(0, topLeft);
-			frustumCorners.SetRow(1, topRight);
-			frustumCorners.SetRow(2, bottomRight);
-			frustumCorners.SetRow(3, bottomLeft);
-
-			//RenderSettings.skybox.SetMatrix("frustumCorners", frustumCorners);
-
-
 			Shader.SetGlobalFloat("exposure", UseLuminance != LUMINANCE.NONE ? Exposure * 1e-5f : Exposure);
 			Shader.SetGlobalVector("earth_center", new Vector3(0.0f, -kBottomRadius / kLengthUnitInMeters, 0.0f));
 			Shader.SetGlobalVector("sun_size", new Vector2(Mathf.Tan(kSunAngularRadius), Mathf.Cos(kSunAngularRadius)));
 			Shader.SetGlobalVector("sun_direction", ((RenderSettings.sun == null) ? Vector3.up : RenderSettings.sun.transform.forward) * -1.0f);
 			Shader.SetGlobalVector("white_point", new Vector3((float)white_point_r, (float)white_point_g, (float)white_point_b));
-			Shader.SetGlobalMatrix("frustumCorners", frustumCorners);
 		}
-
-
-		//void OnRenderImage(RenderTexture src, RenderTexture dest)
-		//{
-		//	Camera camera = Camera.main;
-
-		//	m_material.SetFloat("exposure", UseLuminance != LUMINANCE.NONE ? Exposure * 1e-5f : Exposure);
-		//	m_material.SetVector("earth_center", new Vector3(0.0f, -kBottomRadius / kLengthUnitInMeters, 0.0f));
-		//	m_material.SetVector("sun_size", new Vector2(Mathf.Tan(kSunAngularRadius), Mathf.Cos(kSunAngularRadius)));
-		//	m_material.SetVector("sun_direction", ((RenderSettings.sun == null) ? Vector3.up : RenderSettings.sun.transform.forward) * -1.0f);
-
-		//	double white_point_r = 1.0;
-		//	double white_point_g = 1.0;
-		//	double white_point_b = 1.0;
-		//	if (DoWhiteBalance)
-		//	{
-		//		m_model.ConvertSpectrumToLinearSrgb(out white_point_r, out white_point_g, out white_point_b);
-
-		//		double white_point = (white_point_r + white_point_g + white_point_b) / 3.0;
-		//		white_point_r /= white_point;
-		//		white_point_g /= white_point;
-		//		white_point_b /= white_point;
-		//	}
-
-		//	m_material.SetVector("white_point", new Vector3((float)white_point_r, (float)white_point_g, (float)white_point_b));
-
-		//	float CAMERA_FOV = camera.fieldOfView;
-		//	float CAMERA_ASPECT_RATIO = camera.aspect;
-		//	float CAMERA_NEAR = camera.nearClipPlane;
-		//	float CAMERA_FAR = camera.farClipPlane;
-
-		//	Matrix4x4 frustumCorners = Matrix4x4.identity;
-
-		//	float fovWHalf = CAMERA_FOV * 0.5f;
-
-		//	Vector3 toRight = camera.transform.right * CAMERA_NEAR * Mathf.Tan(fovWHalf * Mathf.Deg2Rad) * CAMERA_ASPECT_RATIO;
-		//	Vector3 toTop = camera.transform.up * CAMERA_NEAR * Mathf.Tan(fovWHalf * Mathf.Deg2Rad);
-
-		//	Vector3 topLeft = (camera.transform.forward * CAMERA_NEAR - toRight + toTop);
-		//	float CAMERA_SCALE = topLeft.magnitude * CAMERA_FAR / CAMERA_NEAR;
-
-		//	topLeft.Normalize();
-		//	topLeft *= CAMERA_SCALE;
-
-		//	Vector3 topRight = (camera.transform.forward * CAMERA_NEAR + toRight + toTop);
-		//	topRight.Normalize();
-		//	topRight *= CAMERA_SCALE;
-
-		//	Vector3 bottomRight = (camera.transform.forward * CAMERA_NEAR + toRight - toTop);
-		//	bottomRight.Normalize();
-		//	bottomRight *= CAMERA_SCALE;
-
-		//	Vector3 bottomLeft = (camera.transform.forward * CAMERA_NEAR - toRight - toTop);
-		//	bottomLeft.Normalize();
-		//	bottomLeft *= CAMERA_SCALE;
-
-		//	frustumCorners.SetRow(0, topLeft);
-		//	frustumCorners.SetRow(1, topRight);
-		//	frustumCorners.SetRow(2, bottomRight);
-		//	frustumCorners.SetRow(3, bottomLeft);
-
-		//	m_material.SetMatrix("frustumCorners", frustumCorners);
-
-		//	CustomGraphicsBlit(src, dest, m_material, 0);
-		//}
-
-		//private void CustomGraphicsBlit(RenderTexture source, RenderTexture dest, Material mat, int passNr)
-		//{
-		//	RenderTexture.active = dest;
-
-		//	mat.SetTexture("_MainTex", source);
-
-		//	GL.PushMatrix();
-		//	GL.LoadOrtho();
-
-		//	mat.SetPass(passNr);
-
-		//	GL.Begin(GL.QUADS);
-
-		//	//This custom blit is needed as infomation about what corner verts relate to what frustum corners is needed
-		//	//A index to the frustum corner is store in the z pos of vert
-
-		//	GL.MultiTexCoord2(0, 0.0f, 0.0f);
-		//	GL.Vertex3(0.0f, 0.0f, 3.0f); // BL
-
-		//	GL.MultiTexCoord2(0, 1.0f, 0.0f);
-		//	GL.Vertex3(1.0f, 0.0f, 2.0f); // BR
-
-		//	GL.MultiTexCoord2(0, 1.0f, 1.0f);
-		//	GL.Vertex3(1.0f, 1.0f, 1.0f); // TR
-
-		//	GL.MultiTexCoord2(0, 0.0f, 1.0f);
-		//	GL.Vertex3(0.0f, 1.0f, 0.0f); // TL
-
-		//	GL.End();
-		//	GL.PopMatrix();
-
-		//}
-
 	}
 
 }

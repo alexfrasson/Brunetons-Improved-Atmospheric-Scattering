@@ -124,7 +124,6 @@ GameObject:
   - component: {fileID: 42736423}
   - component: {fileID: 42736424}
   - component: {fileID: 42736425}
-  - component: {fileID: 42736426}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -165,7 +164,6 @@ MonoBehaviour:
   Exposure: 10
   m_compute: {fileID: 7200000, guid: 46a877cda72d1754080b03d44dc444a5, type: 3}
   m_material: {fileID: 2100000, guid: 054d38ef6545c5341a2385d8d6b786d6, type: 2}
-  color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &42736424
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,18 +193,6 @@ MonoBehaviour:
   camMouseSens: 0.35
   camJoyStickSens: 100
   clickToMove: 1
---- !u!114 &42736426
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 42736421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: 58ab4d02d6fd5f44a9c062d62b557f1a, type: 2}
 --- !u!20 &42736427
 Camera:
   m_ObjectHideFlags: 0
@@ -276,7 +262,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 773cfe8964bda3b4590b935ac969e3bc, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

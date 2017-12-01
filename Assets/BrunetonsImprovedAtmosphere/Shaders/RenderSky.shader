@@ -57,8 +57,8 @@
 			static const float3 kSphereCenter = float3(0.0, 1.0, 0.0);
 			static const float kSphereRadius = 1.0;
 			static const float3 kSphereAlbedo = float3(0.8, 0.8, 0.8);
-			static const float3 kGroundAlbedo = float3(0.0, 0.0, 0.04);
-
+			
+			float3 kGroundAlbedo;
 			float exposure;
 			float3 white_point;
 			float3 earth_center;

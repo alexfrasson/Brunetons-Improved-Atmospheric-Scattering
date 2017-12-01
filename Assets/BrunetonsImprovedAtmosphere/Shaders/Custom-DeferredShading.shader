@@ -46,23 +46,14 @@ Shader "Hidden/Custom-DeferredShading" {
 			#include "IrradianceFunctions.cginc"
 			#include "RenderingFunctions.cginc"
 
-			static const float3 kSphereCenter = float3(0.0, 1.0, 0.0);
-			static const float kSphereRadius = 1.0;
-			static const float3 kSphereAlbedo = float3(0.8, 0.8, 0.8);
-			static const float3 kGroundAlbedo = float3(0.0, 0.0, 0.04);
-
 			float exposure;
 			float3 white_point;
 			float3 earth_center;
-			float2 sun_size;
-
-			float4x4 frustumCorners;
 
 			sampler2D transmittance_texture;
 			sampler2D irradiance_texture;
 			sampler3D scattering_texture;
 			sampler3D single_mie_scattering_texture;
-
 
 #ifdef RADIANCE_API_ENABLED
 			IrradianceSpectrum GetSunAndSkyIrradiance(Position p, Direction normal, Direction sun_direction, out IrradianceSpectrum sky_irradiance)
@@ -89,9 +80,7 @@ Shader "Hidden/Custom-DeferredShading" {
 					camera, _point, shadow_length, sun_direction, transmittance) *
 					SKY_SPECTRAL_RADIANCE_TO_LUMINANCE;
 			}
-
 #endif
-
 			//--------------------------------------------------------------------------------------------------------------
 
 			half4 CalculateLight(unity_v2f_deferred i)
@@ -143,7 +132,7 @@ Shader "Hidden/Custom-DeferredShading" {
 				//---------------------------------- Hack -------------------------------------------
 
 
-				//---------------------------- This should be right solution ------------------------
+				//---------------------------- TODO: this should be right solution ------------------------
 				//sky_irradiance = pow(float3(1, 1, 1) - exp(-sky_irradiance / white_point * exposure), 1.0 / 2.2);
 				//sun_irradiance = pow(float3(1, 1, 1) - exp(-sun_irradiance / white_point * exposure), 1.0 / 2.2);
 
@@ -153,7 +142,7 @@ Shader "Hidden/Custom-DeferredShading" {
 				//ind.diffuse = sky_irradiance;
 				//ind.diffuse = 0;
 				//ind.specular = 0;
-				//---------------------------- This should be right solution ------------------------
+				//---------------------------- TODO: this should be right solution ------------------------
 
 				#else
 
