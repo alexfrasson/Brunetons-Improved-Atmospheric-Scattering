@@ -13,7 +13,7 @@ namespace BrunetonsImprovedAtmosphere
         static readonly float kBottomRadius = 6360000.0f;
         static readonly float kLengthUnitInMeters = 1000.0f;
 
-        public Light Sun;
+        //public Light Sun;
 
         public bool UseConstantSolarSpectrum = false;
 
@@ -34,6 +34,8 @@ namespace BrunetonsImprovedAtmosphere
         public Material m_material;
 
         private Model m_model;
+
+		public Color color;
 
         /// <summary>
         /// The "real" initialization work, which is specific to our atmosphere model,
@@ -158,7 +160,8 @@ namespace BrunetonsImprovedAtmosphere
             int numScatteringOrders = 4;
             m_model.Init(m_compute, numScatteringOrders);
 
-            m_model.BindToMaterial(m_material);
+			//m_model.BindToMaterial(m_material);
+			m_model.SetShaderGlobalUniforms();
         }
 
         private void OnDestroy()
@@ -167,17 +170,16 @@ namespace BrunetonsImprovedAtmosphere
                 m_model.Release();
         }
 
-
 		private void OnPreRender()
 		{
-			m_model.BindToMaterial(RenderSettings.skybox);
+			//m_model.BindToMaterial(RenderSettings.skybox);
 
 			Camera camera = Camera.main;
 
-			RenderSettings.skybox.SetFloat("exposure", UseLuminance != LUMINANCE.NONE ? Exposure * 1e-5f : Exposure);
-			RenderSettings.skybox.SetVector("earth_center", new Vector3(0.0f, -kBottomRadius / kLengthUnitInMeters, 0.0f));
-			RenderSettings.skybox.SetVector("sun_size", new Vector2(Mathf.Tan(kSunAngularRadius), Mathf.Cos(kSunAngularRadius)));
-			RenderSettings.skybox.SetVector("sun_direction", ((Sun == null) ? Vector3.up : Sun.transform.forward) * -1.0f);
+			//RenderSettings.skybox.SetFloat("exposure", UseLuminance != LUMINANCE.NONE ? Exposure * 1e-5f : Exposure);
+			//RenderSettings.skybox.SetVector("earth_center", new Vector3(0.0f, -kBottomRadius / kLengthUnitInMeters, 0.0f));
+			//RenderSettings.skybox.SetVector("sun_size", new Vector2(Mathf.Tan(kSunAngularRadius), Mathf.Cos(kSunAngularRadius)));
+			//RenderSettings.skybox.SetVector("sun_direction", ((RenderSettings.sun == null) ? Vector3.up : RenderSettings.sun.transform.forward) * -1.0f);
 
 			double white_point_r = 1.0;
 			double white_point_g = 1.0;
@@ -192,7 +194,7 @@ namespace BrunetonsImprovedAtmosphere
 				white_point_b /= white_point;
 			}
 
-			RenderSettings.skybox.SetVector("white_point", new Vector3((float)white_point_r, (float)white_point_g, (float)white_point_b));
+			//RenderSettings.skybox.SetVector("white_point", new Vector3((float)white_point_r, (float)white_point_g, (float)white_point_b));
 
 			float CAMERA_FOV = camera.fieldOfView;
 			float CAMERA_ASPECT_RATIO = camera.aspect;
@@ -229,7 +231,15 @@ namespace BrunetonsImprovedAtmosphere
 			frustumCorners.SetRow(2, bottomRight);
 			frustumCorners.SetRow(3, bottomLeft);
 
-			RenderSettings.skybox.SetMatrix("frustumCorners", frustumCorners);
+			//RenderSettings.skybox.SetMatrix("frustumCorners", frustumCorners);
+
+
+			Shader.SetGlobalFloat("exposure", UseLuminance != LUMINANCE.NONE ? Exposure * 1e-5f : Exposure);
+			Shader.SetGlobalVector("earth_center", new Vector3(0.0f, -kBottomRadius / kLengthUnitInMeters, 0.0f));
+			Shader.SetGlobalVector("sun_size", new Vector2(Mathf.Tan(kSunAngularRadius), Mathf.Cos(kSunAngularRadius)));
+			Shader.SetGlobalVector("sun_direction", ((RenderSettings.sun == null) ? Vector3.up : RenderSettings.sun.transform.forward) * -1.0f);
+			Shader.SetGlobalVector("white_point", new Vector3((float)white_point_r, (float)white_point_g, (float)white_point_b));
+			Shader.SetGlobalMatrix("frustumCorners", frustumCorners);
 		}
 
 
@@ -240,7 +250,7 @@ namespace BrunetonsImprovedAtmosphere
 		//	m_material.SetFloat("exposure", UseLuminance != LUMINANCE.NONE ? Exposure * 1e-5f : Exposure);
 		//	m_material.SetVector("earth_center", new Vector3(0.0f, -kBottomRadius / kLengthUnitInMeters, 0.0f));
 		//	m_material.SetVector("sun_size", new Vector2(Mathf.Tan(kSunAngularRadius), Mathf.Cos(kSunAngularRadius)));
-		//	m_material.SetVector("sun_direction", ((Sun == null) ? Vector3.up : Sun.transform.forward) * -1.0f);
+		//	m_material.SetVector("sun_direction", ((RenderSettings.sun == null) ? Vector3.up : RenderSettings.sun.transform.forward) * -1.0f);
 
 		//	double white_point_r = 1.0;
 		//	double white_point_g = 1.0;

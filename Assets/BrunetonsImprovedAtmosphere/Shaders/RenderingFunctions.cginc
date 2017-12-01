@@ -349,6 +349,22 @@ IrradianceSpectrum GetSunAndSkyIrradiance(
 	return solar_irradiance * GetTransmittanceToSun(transmittance_texture, r, mu_s) * max(dot(normal, sun_direction), 0.0);
 }
 
+IrradianceSpectrum GetSunAndSkyIrradianceNODOT(
+	TransmittanceTexture transmittance_texture,
+	IrradianceTexture irradiance_texture,
+	Position pos, Direction normal, Direction sun_direction,
+	out IrradianceSpectrum sky_irradiance)
+{
+	Length r = length(pos);
+	Number mu_s = dot(pos, sun_direction) / r;
+
+	// Indirect irradiance (approximated if the surface is not horizontal).
+	sky_irradiance = GetIrradiance(irradiance_texture, r, mu_s) * (1.0 + dot(normal, pos) / r) * 0.5;;
+
+	// Direct irradiance.
+	return solar_irradiance * GetTransmittanceToSun(transmittance_texture, r, mu_s);
+}
+
 
 
 

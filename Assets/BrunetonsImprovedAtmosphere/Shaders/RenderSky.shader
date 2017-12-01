@@ -291,6 +291,9 @@
 				float ray_sphere_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
 				float distance_to_intersection = -p_dot_v - sqrt(kSphereRadius * kSphereRadius - ray_sphere_center_squared_distance);
 
+
+				float3 test;
+
 				// Compute the radiance reflected by the sphere, if the ray intersects it.
 				float sphere_alpha = 0.0;
 				float3 sphere_radiance = float3(0,0,0);
@@ -310,12 +313,17 @@
 					*/
 					float3 _point = camera + view_direction * distance_to_intersection;
 					float3 normal = normalize(_point - kSphereCenter);
+					//float3 normal = float3(0, 1, 0);
 
 					// Compute the radiance reflected by the sphere.
 					float3 sky_irradiance;
 					float3 sun_irradiance = GetSunAndSkyIrradiance(_point - earth_center, normal, sun_direction, sky_irradiance);
 
 					sphere_radiance = kSphereAlbedo * (1.0 / PI) * (sun_irradiance + sky_irradiance);
+
+					//test = sky_irradiance;
+
+					
 
 					/*
 					Finally, we take into account the aerial perspective between the camera and
@@ -328,6 +336,15 @@
 
 					sphere_radiance = sphere_radiance * transmittance + in_scatter;
 				}
+
+				//{
+				//	float3 radiance;
+				//	//radiance = lerp(float3(0, 0, 0), sphere_radiance, sphere_alpha);
+				//	radiance = test;
+				//	//radiance = sphere_radiance;
+				//	radiance = pow(float3(1, 1, 1) - exp(-radiance / white_point * exposure), 1.0 / 2.2);
+				//	return float4(radiance, 1);
+				//}
 
 				/*
 				In the following we repeat the same steps as above, but for the planet sphere
@@ -390,8 +407,9 @@
 
 				radiance = lerp(radiance, ground_radiance, ground_alpha);
 				radiance = lerp(radiance, sphere_radiance, sphere_alpha);
-
+				
 				radiance = pow(float3(1,1,1) - exp(-radiance / white_point * exposure), 1.0 / 2.2);
+
 
 				return float4(radiance, 1);
 			}

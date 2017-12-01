@@ -193,7 +193,6 @@ namespace BrunetonsImprovedAtmosphere
         /// </summary>
         public void BindToMaterial(Material mat)
         {
-
             if (UseLuminance == LUMINANCE.NONE)
                 mat.EnableKeyword("RADIANCE_API_ENABLED");
             else
@@ -248,6 +247,63 @@ namespace BrunetonsImprovedAtmosphere
             Vector3 mieScattering = ToVector(Wavelengths, MieScattering, lambdas, LengthUnitInMeters);
             mat.SetVector("mie_scattering", mieScattering);
         }
+
+		public void SetShaderGlobalUniforms()
+		{
+			if (UseLuminance == LUMINANCE.NONE)
+				Shader.EnableKeyword("RADIANCE_API_ENABLED");
+			else
+				Shader.DisableKeyword("RADIANCE_API_ENABLED");
+
+			if (CombineScatteringTextures)
+				Shader.EnableKeyword("COMBINED_SCATTERING_TEXTURES");
+			else
+				Shader.DisableKeyword("COMBINED_SCATTERING_TEXTURES");
+
+			Shader.SetGlobalTexture("transmittance_texture", TransmittanceTexture);
+			Shader.SetGlobalTexture("scattering_texture", ScatteringTexture);
+			Shader.SetGlobalTexture("irradiance_texture", IrradianceTexture);
+
+			if (CombineScatteringTextures)
+				Shader.SetGlobalTexture("single_mie_scattering_texture", Texture2D.blackTexture);
+			else
+				Shader.SetGlobalTexture("single_mie_scattering_texture", OptionalSingleMieScatteringTexture);
+
+			Shader.SetGlobalInt("TRANSMITTANCE_TEXTURE_WIDTH", CONSTANTS.TRANSMITTANCE_WIDTH);
+			Shader.SetGlobalInt("TRANSMITTANCE_TEXTURE_HEIGHT", CONSTANTS.TRANSMITTANCE_HEIGHT);
+			Shader.SetGlobalInt("SCATTERING_TEXTURE_R_SIZE", CONSTANTS.SCATTERING_R);
+			Shader.SetGlobalInt("SCATTERING_TEXTURE_MU_SIZE", CONSTANTS.SCATTERING_MU);
+			Shader.SetGlobalInt("SCATTERING_TEXTURE_MU_S_SIZE", CONSTANTS.SCATTERING_MU_S);
+			Shader.SetGlobalInt("SCATTERING_TEXTURE_NU_SIZE", CONSTANTS.SCATTERING_NU);
+			Shader.SetGlobalInt("SCATTERING_TEXTURE_WIDTH", CONSTANTS.SCATTERING_WIDTH);
+			Shader.SetGlobalInt("SCATTERING_TEXTURE_HEIGHT", CONSTANTS.SCATTERING_HEIGHT);
+			Shader.SetGlobalInt("SCATTERING_TEXTURE_DEPTH", CONSTANTS.SCATTERING_DEPTH);
+			Shader.SetGlobalInt("IRRADIANCE_TEXTURE_WIDTH", CONSTANTS.IRRADIANCE_WIDTH);
+			Shader.SetGlobalInt("IRRADIANCE_TEXTURE_HEIGHT", CONSTANTS.IRRADIANCE_HEIGHT);
+
+			Shader.SetGlobalFloat("sun_angular_radius", (float)SunAngularRadius);
+			Shader.SetGlobalFloat("bottom_radius", (float)(BottomRadius / LengthUnitInMeters));
+			Shader.SetGlobalFloat("top_radius", (float)(TopRadius / LengthUnitInMeters));
+			Shader.SetGlobalFloat("mie_phase_function_g", (float)MiePhaseFunctionG);
+			Shader.SetGlobalFloat("mu_s_min", (float)Math.Cos(MaxSunZenithAngle));
+
+			Vector3 skySpectralRadianceToLuminance, sunSpectralRadianceToLuminance;
+			SkySunRadianceToLuminance(out skySpectralRadianceToLuminance, out sunSpectralRadianceToLuminance);
+
+			Shader.SetGlobalVector("SKY_SPECTRAL_RADIANCE_TO_LUMINANCE", skySpectralRadianceToLuminance);
+			Shader.SetGlobalVector("SUN_SPECTRAL_RADIANCE_TO_LUMINANCE", sunSpectralRadianceToLuminance);
+
+			double[] lambdas = new double[] { kLambdaR, kLambdaG, kLambdaB };
+
+			Vector3 solarIrradiance = ToVector(Wavelengths, SolarIrradiance, lambdas, 1.0);
+			Shader.SetGlobalVector("solar_irradiance", solarIrradiance);
+
+			Vector3 rayleighScattering = ToVector(Wavelengths, RayleighScattering, lambdas, LengthUnitInMeters);
+			Shader.SetGlobalVector("rayleigh_scattering", rayleighScattering);
+
+			Vector3 mieScattering = ToVector(Wavelengths, MieScattering, lambdas, LengthUnitInMeters);
+			Shader.SetGlobalVector("mie_scattering", mieScattering);
+		}
 
         public void Release()
         {
